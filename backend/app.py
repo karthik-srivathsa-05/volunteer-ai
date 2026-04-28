@@ -632,6 +632,7 @@ def update_status(assignment_id):
 if __name__ == "__main__":
     init_db()
     seed_if_empty()
+    port = int(os.getenv("PORT", "5000"))
     print("Database ready ->", DB_PATH)
-    print("Starting server at http://localhost:5000")
-    app.run(debug=True, port=5000)
+    print(f"Starting server at http://localhost:{port}")
+    app.run(debug=True, host="0.0.0.0", port=port)

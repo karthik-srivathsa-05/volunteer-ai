@@ -4,8 +4,8 @@ AI-powered volunteer coordination for Bengaluru NGOs.
 
 This version uses a simple free-tier-friendly stack:
 - Groq API for AI matching, parsing, and outreach
-- Cloud Run for the backend API
-- Firebase Hosting for the frontend
+- Render for the backend API
+- Vercel for the frontend
 - React + Vite for the web app
 
 ## Project Structure
@@ -32,7 +32,7 @@ SolutionChallenge/
         Dashboard.jsx
         Tasks.jsx
         Volunteers.jsx
-  firebase.json
+  render.yaml
 ```
 
 ## What It Does
@@ -46,8 +46,8 @@ SolutionChallenge/
 
 1. Create a Groq API key in the Groq console.
 2. Use `GROQ_API_KEY` in your backend environment.
-3. Deploy the backend to Cloud Run.
-4. Deploy the frontend to Firebase Hosting.
+3. Deploy the backend to Render.
+4. Deploy the frontend to Vercel.
 5. Optional: set `GROQ_MODEL` if you want to try a different Groq model.
 
 Default model:
@@ -59,9 +59,10 @@ Docs worth knowing:
 - [Groq free plan](https://console.groq.com/settings/billing/plans)
 - [Groq rate limits](https://console.groq.com/docs/rate-limits)
 - [Groq structured outputs](https://console.groq.com/docs/structured-outputs)
-- [Cloud Run pricing and free tier](https://cloud.google.com/run/pricing)
-- [Firebase Hosting quotas and pricing](https://firebase.google.com/docs/hosting/usage-quotas-pricing)
-- [Firebase Hosting rewrites to Cloud Run](https://firebase.google.com/docs/hosting/cloud-run)
+- [Render free plan](https://render.com/pricing)
+- [Render free web services](https://render.com/docs/free)
+- [Vercel Hobby plan](https://vercel.com/docs/plans/hobby)
+- [Vercel pricing](https://vercel.com/pricing)
 
 ## Local Development
 
@@ -108,105 +109,65 @@ Open `http://localhost:3000`.
 
 ## Deployment
 
-The repo is already prepared for Google Cloud deployment.
+The repo is set up for a simple split deployment:
+- `Vercel` for the frontend
+- `Render` for the Flask backend
 
-### Google Cloud setup checklist
+### Backend on Render
 
-Before GitHub Actions can deploy, complete these one-time steps in Google Cloud Console for project `volunteer-ai-7d75a`:
+Render can deploy the backend directly from the `backend/` folder.
 
-1. Enable these APIs:
-   - Cloud Run
-   - Cloud Build
-   - Artifact Registry
-   - Firebase Hosting
-   - IAM Service Account Credentials
-   - Service Usage
+Use these settings for a new Web Service:
+- Root directory: `backend`
+- Runtime: Python
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn app:app`
 
-2. Create or choose a deployer service account for GitHub Actions.
-
-3. Grant the deployer and build identities the permissions Cloud Run source deploys need. Google documents the source-deploy permissions as:
-   - `roles/run.sourceDeveloper`
-   - `roles/serviceusage.serviceUsageConsumer`
-   - `roles/iam.serviceAccountUser`
-   - `roles/run.builder` for the Cloud Build service account
-
-4. Create the GitHub secrets listed below.
-
-Helpful official docs:
-- Cloud Run source deploys: https://cloud.google.com/run/docs/deploying-source-code
-- Cloud Run IAM roles: https://cloud.google.com/run/docs/reference/iam/roles
-- Cloud Build deploy permissions: https://cloud.google.com/build/docs/deploying-builds/deploy-cloud-run
-- Firebase Hosting GitHub integration: https://firebase.google.com/docs/hosting/github-integration
-
-### GitHub Actions deployment
-
-This repo includes `.github/workflows/deploy.yml` so pushes to `main` can deploy automatically once you add the required GitHub secrets.
-
-Add these repository secrets in GitHub:
-- `GCP_PROJECT_ID` = `volunteer-ai-7d75a`
-- `GCP_SA_KEY` = a Google Cloud service account JSON key with Cloud Run deploy permissions
-- `FIREBASE_SERVICE_ACCOUNT_VOLUNTEER_AI_7D75A` = a Firebase service account JSON key for Hosting deploys
+Environment variables:
 - `GROQ_API_KEY` = your Groq API key
+- `GROQ_MODEL` = optional, defaults to `llama-3.1-8b-instant`
 
-The workflow:
-- deploys the backend to Cloud Run as `volunteerai-api`
-- builds the frontend
-- deploys Firebase Hosting
+This repo also includes `render.yaml`, so you can use Render’s blueprint deploy flow if you prefer.
 
-If you want to deploy manually instead of GitHub Actions, the same `gcloud` and `firebase` commands below still apply.
+### Frontend on Vercel
 
-### Backend on Cloud Run
+Use these settings when you import the repo into Vercel:
+- Root directory: `frontend`
+- Framework preset: Vite
+- Build command: `npm run build`
+- Output directory: `dist`
 
-The backend has a `backend/Dockerfile`, so you can deploy it with Cloud Run.
+Add this environment variable in Vercel:
+- `VITE_API_BASE_URL` = your Render backend URL, for example `https://volunteer-ai-api.onrender.com`
 
-Example:
+The frontend reads `VITE_API_BASE_URL` in [`frontend/src/api.js`](frontend/src/api.js) and falls back to `/api` for local development.
 
-```powershell
-gcloud run deploy volunteerai-api `
-  --source backend `
-  --region asia-south1 `
-  --allow-unauthenticated `
-  --set-env-vars GROQ_API_KEY=your_key_here
-```
+### Connect the API URL
 
-Notes:
-- The service name in `firebase.json` is set to `volunteerai-api`
-- The rewrite region in `firebase.json` is set to `asia-south1`
-- If you deploy Cloud Run in a different region, update `firebase.json` too
+After Render gives you the backend URL:
+1. Copy the full backend URL.
+2. Paste it into Vercel as `VITE_API_BASE_URL`.
+3. Redeploy the frontend.
 
-### Frontend on Firebase Hosting
+### Local development
 
-Build the frontend first:
+Local development still works the same way:
+- Backend runs on `http://localhost:5000`
+- Frontend runs on `http://localhost:3000`
+- The Vite dev server proxies `/api` to the backend in `frontend/vite.config.js`
 
-```powershell
-cd frontend
-npm run build
-```
+### Push to GitHub
 
-Then deploy Hosting from the repo root:
+The repo is ready to push and connect to both platforms:
 
 ```powershell
-firebase login
-firebase deploy --only hosting
-```
-
-The `firebase.json` file serves `frontend/dist` and rewrites `/api/**` to the Cloud Run backend.
-
-## GitHub Workflow
-
-If you have not pushed yet:
-
-```powershell
-git init
 git add .
-git commit -m "Use Groq and Google Cloud deployment"
-git branch -M main
-git remote add origin <your-github-repo-url>
-git push -u origin main
+git commit -m "Prepare Vercel and Render deployment"
+git push
 ```
 
 ## Notes
 
 - The backend auto-seeds demo data if the SQLite database is empty.
-- Cloud Run with SQLite is great for demos, but it is still ephemeral storage. If you want durable production data later, we should move the database to a managed Google service.
+- SQLite is fine for demos, but on Render the filesystem is not durable across restarts. For persistent production data, we should move to a managed database later.
 - The current deployment setup is optimized for a hackathon/demo flow and is easy to improve later.

@@ -9,3 +9,4 @@ frontend/.npm-cache/
 files.zip
 *.pyc
 __pycache__/
+.vercel
