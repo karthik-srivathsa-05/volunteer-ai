@@ -140,8 +140,9 @@ Use these settings when you import the repo into Vercel:
 Add this environment variable in Vercel:
 - `VITE_API_BASE_URL` = your Render backend URL, for example `https://volunteer-ai-api.onrender.com`
 
-The frontend reads `VITE_API_BASE_URL` in [`frontend/src/api.js`](frontend/src/api.js) and falls back to `/api` for local development.
-The frontend also includes [`frontend/vercel.json`](frontend/vercel.json), which rewrites `/api/*` to the Render backend so the live Vercel app can talk to the API even if the env var is missing.
+The frontend reads `VITE_API_BASE_URL` in [`frontend/src/api.js`](frontend/src/api.js).
+- In local development it uses `/api` so Vite can proxy to the backend.
+- In production it falls back to the Render backend URL directly if the env var is missing.
 
 ### Connect the API URL
 

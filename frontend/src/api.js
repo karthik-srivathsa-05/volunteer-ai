@@ -1,4 +1,12 @@
-const BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
+const normalizeApiBase = (value) => {
+  const raw = (value || '').trim().replace(/\/$/, '')
+  if (!raw) return ''
+  return raw.endsWith('/api') ? raw : `${raw}/api`
+}
+
+const BASE = import.meta.env.DEV
+  ? '/api'
+  : normalizeApiBase(import.meta.env.VITE_API_BASE_URL) || 'https://volunteer-ai-api.onrender.com/api'
 
 const readJson = async (response) => {
   const data = await response.json().catch(() => ({}))
