@@ -110,6 +110,23 @@ Open `http://localhost:3000`.
 
 The repo is already prepared for Google Cloud deployment.
 
+### GitHub Actions deployment
+
+This repo includes `.github/workflows/deploy.yml` so pushes to `main` can deploy automatically once you add the required GitHub secrets.
+
+Add these repository secrets in GitHub:
+- `GCP_PROJECT_ID` = `volunteer-ai-7d75a`
+- `GCP_SA_KEY` = a Google Cloud service account JSON key with Cloud Run deploy permissions
+- `FIREBASE_SERVICE_ACCOUNT_VOLUNTEER_AI_7D75A` = a Firebase service account JSON key for Hosting deploys
+- `GROQ_API_KEY` = your Groq API key
+
+The workflow:
+- deploys the backend to Cloud Run as `volunteerai-api`
+- builds the frontend
+- deploys Firebase Hosting
+
+If you want to deploy manually instead of GitHub Actions, the same `gcloud` and `firebase` commands below still apply.
+
 ### Backend on Cloud Run
 
 The backend has a `backend/Dockerfile`, so you can deploy it with Cloud Run.
