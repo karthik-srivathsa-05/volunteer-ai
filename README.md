@@ -169,5 +169,6 @@ git push
 ## Notes
 
 - The backend auto-seeds demo data if the SQLite database is empty.
+- The backend now seeds on startup, so a fresh Render deploy will come up with tasks and volunteers automatically.
 - SQLite is fine for demos, but on Render the filesystem is not durable across restarts. For persistent production data, we should move to a managed database later.
 - The current deployment setup is optimized for a hackathon/demo flow and is easy to improve later.

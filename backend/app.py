@@ -96,6 +96,12 @@ def seed_if_empty():
     return False
 
 
+def bootstrap_db():
+    """Initialize schema and seed demo content for both local and hosted runs."""
+    init_db()
+    seed_if_empty()
+
+
 def parse_json_fields(row, fields=("skills", "required_skills", "languages")):
     """Parse JSON string fields in a DB row dict."""
     d = dict(row) if not isinstance(row, dict) else row
@@ -629,9 +635,9 @@ def update_status(assignment_id):
 
 # --- MAIN ----------------------------------------------------------------
 
+bootstrap_db()
+
 if __name__ == "__main__":
-    init_db()
-    seed_if_empty()
     port = int(os.getenv("PORT", "5000"))
     print("Database ready ->", DB_PATH)
     print(f"Starting server at http://localhost:{port}")
