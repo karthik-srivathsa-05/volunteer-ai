@@ -110,6 +110,34 @@ Open `http://localhost:3000`.
 
 The repo is already prepared for Google Cloud deployment.
 
+### Google Cloud setup checklist
+
+Before GitHub Actions can deploy, complete these one-time steps in Google Cloud Console for project `volunteer-ai-7d75a`:
+
+1. Enable these APIs:
+   - Cloud Run
+   - Cloud Build
+   - Artifact Registry
+   - Firebase Hosting
+   - IAM Service Account Credentials
+   - Service Usage
+
+2. Create or choose a deployer service account for GitHub Actions.
+
+3. Grant the deployer and build identities the permissions Cloud Run source deploys need. Google documents the source-deploy permissions as:
+   - `roles/run.sourceDeveloper`
+   - `roles/serviceusage.serviceUsageConsumer`
+   - `roles/iam.serviceAccountUser`
+   - `roles/run.builder` for the Cloud Build service account
+
+4. Create the GitHub secrets listed below.
+
+Helpful official docs:
+- Cloud Run source deploys: https://cloud.google.com/run/docs/deploying-source-code
+- Cloud Run IAM roles: https://cloud.google.com/run/docs/reference/iam/roles
+- Cloud Build deploy permissions: https://cloud.google.com/build/docs/deploying-builds/deploy-cloud-run
+- Firebase Hosting GitHub integration: https://firebase.google.com/docs/hosting/github-integration
+
 ### GitHub Actions deployment
 
 This repo includes `.github/workflows/deploy.yml` so pushes to `main` can deploy automatically once you add the required GitHub secrets.
