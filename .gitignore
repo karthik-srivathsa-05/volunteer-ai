@@ -1,0 +1,11 @@
+backend/venv/
+backend/__pycache__/
+backend/volunteer.db
+frontend/node_modules/
+frontend/dist/
+frontend/.npm-cache/
+.env
+.env.*
+files.zip
+*.pyc
+__pycache__/
